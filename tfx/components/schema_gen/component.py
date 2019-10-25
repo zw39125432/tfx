@@ -100,7 +100,7 @@ class SchemaGen(base_component.BaseComponent):
           'Exactly one of statistics or schema must be supplied.')
 
     spec = SchemaGenSpec(
-        stats=statistics,
+        statistics=statistics,
         schema=schema,
         infer_feature_shape=infer_feature_shape,
         output=output)

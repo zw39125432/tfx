@@ -72,5 +72,5 @@ class StatisticsGen(base_component.BaseComponent):
             standard_artifacts.ExampleStatistics(split=split)
             for split in artifact.DEFAULT_EXAMPLE_SPLITS
         ])
-    spec = StatisticsGenSpec(input_data=examples, output=output)
+    spec = StatisticsGenSpec(examples=examples, output=output)
     super(StatisticsGen, self).__init__(spec=spec, instance_name=instance_name)

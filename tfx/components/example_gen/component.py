@@ -164,7 +164,7 @@ class FileBasedExampleGen(base_component.BaseComponent):
             input_config, output_config)
     ])
     spec = FileBasedExampleGenSpec(
-        input_base=input,
+        input=input,
         input_config=input_config,
         output_config=output_config,
         custom_config=custom_config,

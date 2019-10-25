@@ -86,6 +86,7 @@ class ExampleValidator(base_component.BaseComponent):
     output = output or types.Channel(
         type=standard_artifacts.ExampleAnomalies,
         artifacts=[standard_artifacts.ExampleAnomalies()])
-    spec = ExampleValidatorSpec(stats=statistics, schema=schema, output=output)
+    spec = ExampleValidatorSpec(
+        statistics=statistics, schema=schema, output=output)
     super(ExampleValidator, self).__init__(
         spec=spec, instance_name=instance_name)

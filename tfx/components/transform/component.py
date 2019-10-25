@@ -119,7 +119,7 @@ class Transform(base_component.BaseComponent):
             for split in artifact.DEFAULT_EXAMPLE_SPLITS
         ])
     spec = TransformSpec(
-        input_data=examples,
+        examples=examples,
         schema=schema,
         module_file=module_file,
         preprocessing_fn=preprocessing_fn,

@@ -102,13 +102,13 @@ class Evaluator(base_component.BaseComponent):
 
       Either `model_exports` or `model` must be present in the input arguments.
     """
-    model_exports = model_exports or model
+    model = model or model_exports
     output = output or types.Channel(
         type=standard_artifacts.ModelEvaluation,
         artifacts=[standard_artifacts.ModelEvaluation()])
     spec = EvaluatorSpec(
         examples=examples,
-        model_exports=model_exports,
+        model=model,
         feature_slicing_spec=(feature_slicing_spec or
                               evaluator_pb2.FeatureSlicingSpec()),
         fairness_indicator_thresholds=fairness_indicator_thresholds,

@@ -102,7 +102,7 @@ class Pusher(base_component.BaseComponent):
                        'custom_executor_spec is supplied that does not require '
                        'it.')
     spec = PusherSpec(
-        model_export=model,
+        model=model,
         model_blessing=model_blessing,
         push_destination=push_destination,
         custom_config=custom_config,

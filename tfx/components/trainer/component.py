@@ -183,7 +183,7 @@ class Trainer(base_component.BaseComponent):
         type=standard_artifacts.Model, artifacts=[standard_artifacts.Model()])
     spec = TrainerSpec(
         examples=examples,
-        transform_output=transform_graph,
+        transform_graph=transform_graph,
         schema=schema,
         train_args=train_args,
         eval_args=eval_args,

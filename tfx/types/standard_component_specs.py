@@ -69,15 +69,16 @@ class EvaluatorSpec(ComponentSpec):
   INPUTS = {
       'examples': ChannelParameter(type=standard_artifacts.Examples),
       # TODO(b/139281215): this will be renamed to 'model' in the future.
-      'model_exports': ChannelParameter(type=standard_artifacts.Model),
+      'model': ChannelParameter(type=standard_artifacts.Model),
   }
   OUTPUTS = {
-      'output': ChannelParameter(type=standard_artifacts.ModelEvaluation),
+      'evaluation': ChannelParameter(type=standard_artifacts.ModelEvaluation),
   }
-  # TODO(b/139281215): these input / output names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed or will be
+  # renamed in the future.
+  # These compatibility aliases are provided for compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'model': 'model_exports',
+      'model_exports': 'model',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
       'evaluation': 'output',
@@ -89,17 +90,16 @@ class ExampleValidatorSpec(ComponentSpec):
 
   PARAMETERS = {}
   INPUTS = {
-      # TODO(b/139281215): this will be renamed to 'statistics' in the future.
-      'stats': ChannelParameter(type=standard_artifacts.ExampleStatistics),
+      'statistics': ChannelParameter(type=standard_artifacts.ExampleStatistics),
       'schema': ChannelParameter(type=standard_artifacts.Schema),
   }
   OUTPUTS = {
       'output': ChannelParameter(type=standard_artifacts.ExampleAnomalies),
   }
-  # TODO(b/139281215): these input / output names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed.
+  # These compatibility aliases are provided for backwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'statistics': 'stats',
+      'stats': 'statistics',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
       'anomalies': 'output',
@@ -118,16 +118,15 @@ class FileBasedExampleGenSpec(ComponentSpec):
           ExecutionParameter(type=example_gen_pb2.CustomConfig, optional=True),
   }
   INPUTS = {
-      # TODO(b/139281215): this will be renamed to 'input' in the future.
-      'input_base': ChannelParameter(type=standard_artifacts.ExternalArtifact),
+      'input': ChannelParameter(type=standard_artifacts.ExternalArtifact),
   }
   OUTPUTS = {
       'examples': ChannelParameter(type=standard_artifacts.Examples),
   }
-  # TODO(b/139281215): these input names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed.
+  # These compatibility aliases are provided for backwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'input': 'input_base',
+      'input_base': 'input',
   }
 
 
@@ -154,20 +153,19 @@ class PusherSpec(ComponentSpec):
           ExecutionParameter(type=Dict[Text, Any], optional=True),
   }
   INPUTS = {
-      # TODO(b/139281215): this will be renamed to 'model' in the future.
-      'model_export': ChannelParameter(type=standard_artifacts.Model),
+      'model': ChannelParameter(type=standard_artifacts.Model),
       'model_blessing': ChannelParameter(type=standard_artifacts.ModelBlessing),
   }
   OUTPUTS = {
       'model_push': ChannelParameter(type=standard_artifacts.PushedModel),
   }
-  # TODO(b/139281215): these input / output names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed.
+  # These compatibility aliases are provided for backwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'model': 'model_export',
+      'model_export': 'model',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
-      'pushed_model': 'model_push',
+      'model_push': 'pushed_model',
   }
 
 
@@ -195,23 +193,22 @@ class SchemaGenSpec(ComponentSpec):
       'infer_feature_shape': ExecutionParameter(type=bool, optional=True)
   }
   INPUTS = {
-      # TODO(b/139281215): this will be renamed to 'statistics' in the future.
-      'stats':
+      'statistics':
           ChannelParameter(
               type=standard_artifacts.ExampleStatistics, optional=True),
       'schema':
           ChannelParameter(type=standard_artifacts.Schema, optional=True),
   }
   OUTPUTS = {
-      'output': ChannelParameter(type=standard_artifacts.Schema),
+      'schema': ChannelParameter(type=standard_artifacts.Schema),
   }
-  # TODO(b/139281215): these input / output names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed.
+  # These compatibility aliases are provided for backwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'statistics': 'stats',
+      'stats': 'statistics',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
-      'schema': 'output',
+      'output': 'schema',
   }
 
 
@@ -220,16 +217,15 @@ class StatisticsGenSpec(ComponentSpec):
 
   PARAMETERS = {}
   INPUTS = {
-      # TODO(b/139281215): this will be renamed to 'examples' in the future.
-      'input_data': ChannelParameter(type=standard_artifacts.Examples),
+      'examples': ChannelParameter(type=standard_artifacts.Examples),
   }
   OUTPUTS = {
       'output': ChannelParameter(type=standard_artifacts.ExampleStatistics),
   }
-  # TODO(b/139281215): these input / output names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed.
+  # These compatibility aliases are provided for backwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'examples': 'input_data',
+      'input_data': 'examples',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
       'statistics': 'output',
@@ -249,9 +245,7 @@ class TrainerSpec(ComponentSpec):
   INPUTS = {
       'examples':
           ChannelParameter(type=standard_artifacts.Examples),
-      # TODO(b/139281215): this will be renamed to 'transform_graph' in the
-      # future.
-      'transform_output':
+      'transform_graph':
           ChannelParameter(
               type=standard_artifacts.TransformGraph, optional=True),
       'schema':
@@ -260,10 +254,10 @@ class TrainerSpec(ComponentSpec):
   OUTPUTS = {
       'output': ChannelParameter(type=standard_artifacts.Model),
   }
-  # TODO(b/139281215): these input / output names will be renamed in the future.
-  # These compatibility aliases are provided for forwards compatibility.
+  # TODO(b/139281215): these input / output names have been renamed.
+  # These compatibility aliases are provided for backwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'transform_graph': 'transform_output',
+      'transform_output': 'transform_graph',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
       'model': 'output',
@@ -279,21 +273,20 @@ class TransformSpec(ComponentSpec):
       'custom_config': ExecutionParameter(type=Dict[Text, Any], optional=True),
   }
   INPUTS = {
-      # TODO(b/139281215): this will be renamed to 'examples' in the future.
-      'input_data': ChannelParameter(type=standard_artifacts.Examples),
+      'examples': ChannelParameter(type=standard_artifacts.Examples),
       'schema': ChannelParameter(type=standard_artifacts.Schema),
   }
   OUTPUTS = {
       'transform_output':
           ChannelParameter(type=standard_artifacts.TransformGraph),
-      'transformed_examples':
+      'transform_graph':
           ChannelParameter(type=standard_artifacts.Examples),
   }
   # TODO(b/139281215): these input / output names will be renamed in the future.
   # These compatibility aliases are provided for forwards compatibility.
   _INPUT_COMPATIBILITY_ALIASES = {
-      'examples': 'input_data',
+      'input_data': 'examples',
   }
   _OUTPUT_COMPATIBILITY_ALIASES = {
-      'transform_graph': 'transform_output',
+      'transform_output': 'transform_graph',
   }
