@@ -25,6 +25,9 @@
     tuner support.
 *   Demonstrated multi-core processing in Flink and Spark Chicago Taxi
     PortableRunner example.
+*   Pipelines compiled using KubeflowDagRunner now defaults to using the
+    gRPC-based MLMD server deployed in Kubeflow Pipelines clusters when
+    performing operations on pipeline metadata.
 
 ## Bug fixes and other changes
 
