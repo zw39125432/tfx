@@ -21,7 +21,7 @@ from __future__ import print_function
 import os
 from typing import Text
 
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 from tfx_bsl.version import __version__ as tfx_bsl_version
 
 from tfx.examples.chicago_taxi_pipeline import taxi_pipeline_importer
@@ -92,7 +92,7 @@ class TaxiPipelineImporterEndToEndTest(tf.test.TestCase):
 
     self.assertPipelineExecution()
 
-    # Runs the pipeline again.
+    # Run pipeline again.
     BeamDagRunner().run(
         taxi_pipeline_importer._create_pipeline(
             pipeline_name=self._pipeline_name,
@@ -104,32 +104,14 @@ class TaxiPipelineImporterEndToEndTest(tf.test.TestCase):
             metadata_path=self._metadata_path,
             direct_num_workers=1))
 
-    # All executions but ModelValidator and Pusher are cached.
-    with metadata.Metadata(metadata_config) as m:
-      # Artifact count is increased by 2 caused by ModelValidator and Pusher.
-      self.assertEqual(artifact_count + 2, len(m.store.get_artifacts()))
-      artifact_count = len(m.store.get_artifacts())
-      # 10 more cached executions.
-      self.assertEqual(20, len(m.store.get_executions()))
-
-    # Runs the pipeline the third time.
-    BeamDagRunner().run(
-        taxi_pipeline_importer._create_pipeline(
-            pipeline_name=self._pipeline_name,
-            data_root=self._data_root,
-            user_schema_path=self._user_schema_path,
-            module_file=self._module_file,
-            serving_model_dir=self._serving_model_dir,
-            pipeline_root=self._pipeline_root,
-            metadata_path=self._metadata_path,
-            direct_num_workers=1))
-
-    # Asserts cache execution.
+    # Assert cache execution.
     with metadata.Metadata(metadata_config) as m:
       # Artifact count is unchanged.
       self.assertEqual(artifact_count, len(m.store.get_artifacts()))
-      # 10 more cached executions.
-      self.assertEqual(30, len(m.store.get_executions()))
+      # 9 more cached executions.
+      self.assertEqual(20, len(m.store.get_executions()))
+
+    self.assertPipelineExecution()
 
 
 if __name__ == '__main__':

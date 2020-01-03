@@ -25,6 +25,7 @@
     tuner support.
 *   Demonstrated multi-core processing in Flink and Spark Chicago Taxi
     PortableRunner example.
+*   Prototyped Tuner as a custom component, and create an e2e iris example.
 
 ## Bug fixes and other changes
 
