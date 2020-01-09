@@ -22,7 +22,7 @@ import argparse
 import base64
 import json
 
-import absl
+from absl import logging
 
 from tensorflow.python.platform import app  # pylint: disable=g-direct-tensorflow-import
 from tfx.components.base import base_executor
@@ -79,9 +79,6 @@ def _run_executor(args, pipeline_args) -> None:
   Raises:
     None
   """
-
-  absl.logging.set_verbosity(absl.logging.INFO)
-
   (inputs_str, outputs_str,
    exec_properties_str) = (args.inputs or base64.b64decode(args.inputs_base64),
                            args.outputs or
@@ -92,16 +89,28 @@ def _run_executor(args, pipeline_args) -> None:
   inputs = artifact_utils.parse_artifact_dict(inputs_str)
   outputs = artifact_utils.parse_artifact_dict(outputs_str)
   exec_properties = json.loads(exec_properties_str)
-  absl.logging.info(
-      'Executor {} do: inputs: {}, outputs: {}, exec_properties: {}'.format(
-          args.executor_class_path, inputs, outputs, exec_properties))
+
+  # Technically exec_properties value can only be a primitive (e.g. string), and
+  # one of our convention is to use proto object by JSON-serializing it.
+  # Unfortunately, run_executor.py script accepts serialized exec_properties as
+  # an input, thus proto object value would be serialized twice. This is really
+  # inconvenient if you're manually constructing exec_properties, so we allow
+  # to feed in non-serialized values of exec_properties, and serialize them
+  # here.
+  for key, value in exec_properties.items():
+    if isinstance(value, (dict, list)):
+      exec_properties[key] = json.dumps(value)
+
+  logging.info(
+      'Executor %s do: inputs: %s, outputs: %s, exec_properties: %s',
+      args.executor_class_path, inputs, outputs, exec_properties)
   executor_cls = import_utils.import_class_by_path(args.executor_class_path)
   executor_context = base_executor.BaseExecutor.Context(
       beam_pipeline_args=pipeline_args,
       tmp_dir=args.temp_directory_path,
       unique_id='')
   executor = executor_cls(executor_context)
-  absl.logging.info('Starting executor')
+  logging.info('Starting executor')
   executor.Do(inputs, outputs, exec_properties)
 
   # The last line of stdout will be pushed to xcom by Airflow.
@@ -186,4 +195,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
+  logging.set_verbosity(logging.INFO)
   app.run(main=main)
