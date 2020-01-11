@@ -66,6 +66,7 @@ class Pusher(base_component.BaseComponent):
       self,
       model: types.Channel = None,
       model_blessing: types.Channel = None,
+      infra_blessing: Optional[types.Channel] = None,
       push_destination: Optional[Union[pusher_pb2.PushDestination,
                                        Dict[Text, Any]]] = None,
       custom_config: Optional[Dict[Text, Any]] = None,
@@ -80,6 +81,8 @@ class Pusher(base_component.BaseComponent):
         a Trainer component.
       model_blessing: A Channel of type `standard_artifacts.ModelBlessing`,
         usually produced by a ModelValidator component. _required_
+      infra_blessing: A Channel of type `standard_artifacts.InfraBlessing`
+        produced from a InfraValidator component.
       push_destination: A pusher_pb2.PushDestination instance, providing info
         for tensorflow serving to load models. Optional if executor_class
         doesn't require push_destination. If any field is provided as a
@@ -106,6 +109,7 @@ class Pusher(base_component.BaseComponent):
     spec = PusherSpec(
         model_export=model,
         model_blessing=model_blessing,
+        infra_blessing=infra_blessing,
         push_destination=push_destination,
         custom_config=custom_config,
         model_push=model_push)

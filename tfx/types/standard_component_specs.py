@@ -176,6 +176,8 @@ class PusherSpec(ComponentSpec):
       # TODO(b/139281215): this will be renamed to 'model' in the future.
       'model_export': ChannelParameter(type=standard_artifacts.Model),
       'model_blessing': ChannelParameter(type=standard_artifacts.ModelBlessing),
+      'infra_blessing': ChannelParameter(type=standard_artifacts.InfraBlessing,
+                                         optional=True),
   }
   OUTPUTS = {
       'model_push': ChannelParameter(type=standard_artifacts.PushedModel),
