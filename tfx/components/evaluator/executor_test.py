@@ -20,7 +20,8 @@ from __future__ import print_function
 
 import os
 import absl
-import tensorflow as tf
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow_model_analysis as tfma
 from google.protobuf import json_format
 from tfx.components.evaluator import executor
 from tfx.proto import evaluator_pb2
@@ -55,14 +56,15 @@ class ExecutorTest(tf.test.TestCase):
 
     # Create exec proterties.
     exec_properties = {
-        'feature_slicing_spec':
+        'eval_config':
             json_format.MessageToJson(
-                evaluator_pb2.FeatureSlicingSpec(specs=[
-                    evaluator_pb2.SingleSlicingSpec(
-                        column_for_slicing=['trip_start_hour']),
-                    evaluator_pb2.SingleSlicingSpec(
-                        column_for_slicing=['trip_start_day', 'trip_miles']),
-                ]),
+                tfma.EvalConfig(
+                    model_specs=[tfma.ModelSpec()],
+                    slicing_specs=[
+                        tfma.SlicingSpec(feature_keys=['trip_start_hour']),
+                        tfma.SlicingSpec(
+                            feature_keys=['trip_start_day', 'trip_miles']),
+                    ]),
                 preserving_proto_field_name=True)
     }
 
@@ -73,7 +75,8 @@ class ExecutorTest(tf.test.TestCase):
       # indicators.
       import tensorflow_model_analysis.addons.fairness.post_export_metrics.fairness_indicators  # pylint: disable=g-import-not-at-top, unused-variable
       exec_properties['fairness_indicator_thresholds'] = [
-          0.1, 0.3, 0.5, 0.7, 0.9]
+          0.1, 0.3, 0.5, 0.7, 0.9
+      ]
     except ImportError:
       absl.logging.warning(
           'Not testing fairness indicators because a compatible TFMA version '
@@ -85,9 +88,53 @@ class ExecutorTest(tf.test.TestCase):
 
     # Check evaluator outputs.
     self.assertTrue(
-        # TODO(b/141490237): Update to only check eval_config.json after TFMA
-        # released with corresponding change.
-        tf.io.gfile.exists(os.path.join(eval_output.uri, 'eval_config')) or
+        tf.io.gfile.exists(os.path.join(eval_output.uri, 'eval_config.json')))
+    self.assertTrue(
+        tf.io.gfile.exists(os.path.join(eval_output.uri, 'metrics')))
+    self.assertTrue(tf.io.gfile.exists(os.path.join(eval_output.uri, 'plots')))
+
+  def testLegacyDo(self):
+    source_data_dir = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), 'testdata')
+    output_data_dir = os.path.join(
+        os.environ.get('TEST_UNDECLARED_OUTPUTS_DIR', self.get_temp_dir()),
+        self._testMethodName)
+
+    # Create input dict.
+    examples = standard_artifacts.Examples()
+    examples.uri = os.path.join(source_data_dir, 'csv_example_gen')
+    examples.split_names = artifact_utils.encode_split_names(['train', 'eval'])
+    model_exports = standard_artifacts.Model()
+    model_exports.uri = os.path.join(source_data_dir, 'trainer/current')
+    input_dict = {
+        'examples': [examples],
+        'model_exports': [model_exports],
+    }
+
+    # Create output dict.
+    eval_output = standard_artifacts.ModelEvaluation()
+    eval_output.uri = os.path.join(output_data_dir, 'eval_output')
+    output_dict = {'output': [eval_output]}
+
+    # Create exec proterties.
+    exec_properties = {
+        'feature_slicing_spec':
+            json_format.MessageToJson(
+                evaluator_pb2.FeatureSlicingSpec(specs=[
+                    evaluator_pb2.SingleSlicingSpec(
+                        column_for_slicing=['trip_start_hour']),
+                    evaluator_pb2.SingleSlicingSpec(
+                        column_for_slicing=['trip_start_day', 'trip_miles']),
+                ]),
+                preserving_proto_field_name=True),
+    }
+
+    # Run executor.
+    evaluator = executor.Executor()
+    evaluator.Do(input_dict, output_dict, exec_properties)
+
+    # Check evaluator outputs.
+    self.assertTrue(
         tf.io.gfile.exists(os.path.join(eval_output.uri, 'eval_config.json')))
     self.assertTrue(
         tf.io.gfile.exists(os.path.join(eval_output.uri, 'metrics')))

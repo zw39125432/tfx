@@ -69,8 +69,10 @@ class Executor(base_executor.BaseExecutor):
       output_dict: Output dict from output key to a list of Artifacts.
         - output: model evaluation results.
       exec_properties: A dict of execution properties.
+        - eval_config: JSON string of tfma.EvalConfig.
         - feature_slicing_spec: JSON string of evaluator_pb2.FeatureSlicingSpec
-          instance, providing the way to slice the data.
+          instance, providing the way to slice the data. Deprecated, use
+          eval_config.slicing_specs instead.
 
     Returns:
       None
@@ -88,11 +90,17 @@ class Executor(base_executor.BaseExecutor):
     model_exports_uri = artifact_utils.get_single_uri(
         input_dict['model_exports'])
 
-    feature_slicing_spec = evaluator_pb2.FeatureSlicingSpec()
-    json_format.Parse(exec_properties['feature_slicing_spec'],
-                      feature_slicing_spec)
-    slice_spec = self._get_slice_spec_from_feature_slicing_spec(
-        feature_slicing_spec)
+    if 'eval_config' in exec_properties:
+      slice_spec = None
+      eval_config = tfma.EvalConfig()
+      json_format.Parse(exec_properties['eval_config'], eval_config)
+    else:
+      eval_config = None
+      feature_slicing_spec = evaluator_pb2.FeatureSlicingSpec()
+      json_format.Parse(exec_properties['feature_slicing_spec'],
+                        feature_slicing_spec)
+      slice_spec = self._get_slice_spec_from_feature_slicing_spec(
+          feature_slicing_spec)
 
     output_uri = artifact_utils.get_single_uri(output_dict['output'])
 
@@ -126,7 +134,8 @@ class Executor(base_executor.BaseExecutor):
        |
        'ExtractEvaluateAndWriteResults' >> tfma.ExtractEvaluateAndWriteResults(
            eval_shared_model=eval_shared_model,
-           slice_spec=slice_spec,
-           output_path=output_uri))
+           eval_config=eval_config,
+           output_path=output_uri,
+           slice_spec=slice_spec))
     absl.logging.info(
         'Evaluation complete. Results written to {}.'.format(output_uri))

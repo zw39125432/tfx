@@ -25,6 +25,7 @@
     tuner support.
 *   Demonstrated multi-core processing in Flink and Spark Chicago Taxi
     PortableRunner example.
+*   Updated to support passing `tfma.EvalConfig` in evaluator when calling TFMA.
 
 ## Bug fixes and other changes
 
