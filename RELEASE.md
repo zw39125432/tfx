@@ -25,6 +25,8 @@
     tuner support.
 *   Demonstrated multi-core processing in Flink and Spark Chicago Taxi
     PortableRunner example.
+*   Created new generic trainer executor for non estimator based model, e.g.,
+    native Keras.
 
 ## Bug fixes and other changes
 
