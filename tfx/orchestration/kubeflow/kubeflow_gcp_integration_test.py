@@ -85,11 +85,12 @@ class KubeflowGCPIntegrationTest(test_utils.BaseKubeflowTest):
     self.raw_examples_importer = ImporterNode(
         instance_name='raw_examples',
         source_uri=[
-            os.path.join(self._testdata_root, 'csv_example_gen', 'train'),
-            os.path.join(self._testdata_root, 'csv_example_gen', 'eval')
+            os.path.join(self._testdata_root, 'csv_example_gen'),
+            os.path.join(self._testdata_root, 'csv_example_gen')
         ],
         artifact_type=standard_artifacts.Examples,
         reimport=True,
+        # TODO(b/147669309): split property is being removed from ImporterNode.
         split=['train', 'eval'])
 
     # Transformed Example artifacts for testing.
@@ -97,12 +98,13 @@ class KubeflowGCPIntegrationTest(test_utils.BaseKubeflowTest):
         instance_name='transformed_examples',
         source_uri=[
             os.path.join(self._testdata_root, 'transform',
-                         'transformed_examples', 'train'),
+                         'transformed_examples'),
             os.path.join(self._testdata_root, 'transform',
-                         'transformed_examples', 'eval')
+                         'transformed_examples')
         ],
         artifact_type=standard_artifacts.Examples,
         reimport=True,
+        # TODO(b/147669309): split property is being removed from ImporterNode.
         split=['train', 'eval'])
 
     # Schema artifact for testing.
@@ -140,6 +142,9 @@ class KubeflowGCPIntegrationTest(test_utils.BaseKubeflowTest):
                                 'blessed'),
         artifact_type=standard_artifacts.ModelBlessing,
         reimport=True)
+    # TODO(b/147669309): ImporterNode does not support custom property.
+    self.model_blessing_importer.outputs['result'][0].set_int_custom_property(
+        'blessed', 1)
 
   def testCsvExampleGenOnDataflowRunner(self):
     """CsvExampleGen-only test pipeline on DataflowRunner invocation."""
@@ -169,7 +174,7 @@ class KubeflowGCPIntegrationTest(test_utils.BaseKubeflowTest):
         Transform(
             examples=self.raw_examples_importer.outputs['result'],
             schema=self.schema_importer.outputs['result'],
-            module_file=self._taxi_module_file)
+            module_file=self._transform_module)
     ])
     self._compile_and_run_pipeline(pipeline)
 
@@ -211,7 +216,7 @@ class KubeflowGCPIntegrationTest(test_utils.BaseKubeflowTest):
         Trainer(
             custom_executor_spec=executor_spec.ExecutorClassSpec(
                 ai_platform_trainer_executor.Executor),
-            module_file=self._taxi_module_file,
+            module_file=self._trainer_module,
             transformed_examples=self.transformed_examples_importer
             .outputs['result'],
             schema=self.schema_importer.outputs['result'],
